@@ -26,7 +26,8 @@ def test_fixture_is_python_truth():
                   np.array([c["s"]]))
         w = {k: np.array(v, np.float32) for k, v in c["weights"].items()}
         p = predict_grid(c["kind"], w, fields, np.array(c["state"], np.int8).reshape(1, L, L))
-        assert np.allclose(p.ravel(), c["expected"], atol=1e-7, rtol=0)
+        # float32 matmul rounding differs across CPUs/BLAS builds at the 1e-7 level
+        assert np.allclose(p.ravel(), c["expected"], atol=2e-6, rtol=0)
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
