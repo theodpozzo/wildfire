@@ -5,6 +5,10 @@ exploratory and separate from the confirmatory results. Code: `scripts/embers.py
 
 ## What surprised me
 
+(Updated after H1-H5 finished, still before either ember ran.) All 75 eligible GNN
+seeds were locally excellent, none passed H2, but 46 of the 75 had a critical-s
+interval that did not overlap the simulator's.
+
 Most GNN seeds were locally excellent by a wide margin (excess Brier often 10-50x
 below the 0.002 margin), and their critical-s errors were small next to the
 transition width, yet many of those errors were clearly non-zero: the model's
