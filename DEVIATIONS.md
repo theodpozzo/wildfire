@@ -23,3 +23,23 @@ describe choices made while setting it up.
 4. **A timing pilot trained two models before the pre-registration commit** (see
    PREREGISTRATION.md, "Timing"). Their results were seen. Nothing in the
    hypotheses or margins was changed after seeing them.
+
+## After pre-registration
+
+5. **No changes to hypotheses, metrics, margins, models, seeds or the trial rule.**
+   All 101 model and baseline jobs ran as registered (3 families x 6 learned
+   models x 5 seeds, plus the wind-blind model in B x 5 seeds, plus never-ignite
+   and persistence per family).
+6. **Calibration is reported as ECE in the tables**; the full 10-bin reliability
+   data for every seed is in `results/models/*.json` and `results/summary.json`,
+   but is not plotted.
+7. **Smoke settings for `make reproduce`** use 2 seeds, 300 training steps and
+   L=64 rollouts, so its numbers differ from the full run by design; it exists to
+   check the pipeline and regenerate small figures in under 10 minutes (measured
+   6 min on 4 idle vCPUs).
+8. **The demo burns a 64 x 64 grid** for speed in the browser, while the crossing
+   curves it shows were measured at L=128. The page says so.
+9. **`make full` was not re-run end to end** after the final code changes. The
+   committed results come from the runs logged in the git history; later commits
+   changed only reporting, figures, the demo, tests and the smoke settings. `make
+   reproduce` and the full test suite were re-run on the final code.
