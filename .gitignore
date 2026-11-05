@@ -9,3 +9,4 @@ logs/
 *.npz
 !tests/fixtures/*.npz
 data/
+!results/weights/*.npz
