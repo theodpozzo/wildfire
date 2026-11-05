@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Tipping Point Survey</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="sheet-head">
+  <p class="sheet-no">SHEET 1 OF 1 &middot; SYNTHETIC TERRAIN &middot; GRID 64 &times; 64</p>
+  <h1>Tipping Point Survey</h1>
+  <p class="lede">A fire on a grid either dies out or crosses the map, and a small change in the
+  spread control <var>s</var> decides which. Here a simulator and a neural network trained on it burn the
+  same landscape side by side.</p>
+  <p class="warning" role="note"><strong>Not a safety tool.</strong> This is a toy simulation on made-up
+  terrain. It must never inform real fire or evacuation decisions.</p>
+</header>
+
+<main>
+  <section class="finding" aria-labelledby="finding-h">
+    <h2 id="finding-h">What was measured</h2>
+    <p id="answer" class="answer">Loading results&hellip;</p>
+  </section>
+
+  <section class="survey" aria-labelledby="survey-h">
+    <h2 id="survey-h">Burn a landscape</h2>
+    <div class="controls">
+      <fieldset>
+        <legend>Terrain family</legend>
+        <label><input type="radio" name="family" value="A" checked> A &middot; uniform</label>
+        <label><input type="radio" name="family" value="B"> B &middot; wind</label>
+        <label><input type="radio" name="family" value="C"> C &middot; patchy, moist, sloped</label>
+      </fieldset>
+      <div class="row">
+        <label for="model">Learned model</label>
+        <select id="model">
+          <option value="mpnn1">generic 1-hop MPNN</option>
+          <option value="structured">structured (true form built in)</option>
+        </select>
+      </div>
+      <div class="row slider">
+        <label for="s">Base spread <var>s</var></label>
+        <input id="s" type="range" min="0.30" max="1.00" step="0.005" value="0.57" aria-describedby="s-out">
+        <output id="s-out" for="s">0.570</output>
+      </div>
+      <div class="row buttons">
+        <button id="gen" type="button">New landscape</button>
+        <button id="run" type="button" class="primary">Light top row</button>
+        <button id="stepb" type="button">Step</button>
+        <button id="reset" type="button">Reset fire</button>
+      </div>
+      <fieldset class="paint">
+        <legend>Paint on either map (drag, or focus a map and use arrows + space)</legend>
+        <label><input type="radio" name="brush" value="fuel" checked> fuel</label>
+        <label><input type="radio" name="brush" value="clear"> firebreak</label>
+        <label><input type="radio" name="brush" value="wet"> wet</label>
+        <label><input type="radio" name="brush" value="dry"> dry</label>
+      </fieldset>
+    </div>
+
+    <div class="maps">
+      <figure>
+        <canvas id="cv-sim" width="64" height="64" tabindex="0" aria-label="Simulator map. Arrow keys move the brush, space paints."></canvas>
+        <figcaption><span class="tag">SIMULATOR</span> <span id="st-sim" aria-live="polite">not lit</span></figcaption>
+      </figure>
+      <figure>
+        <canvas id="cv-mod" width="64" height="64" tabindex="0" aria-label="Learned model map. Arrow keys move the brush, space paints."></canvas>
+        <figcaption><span class="tag">LEARNED MODEL</span> <span id="st-mod" aria-live="polite">not lit</span></figcaption>
+      </figure>
+    </div>
+    <p class="legend-key"><span class="k fuel"></span>fuel <span class="k wet"></span>wet fuel <span class="k empty"></span>bare
+      <span class="k fire"></span>burning <span class="k ash"></span>burnt</p>
+  </section>
+
+  <section class="curve" aria-labelledby="curve-h">
+    <h2 id="curve-h">Where the tipping point sits</h2>
+    <p>Measured share of fires that cross a 128 &times; 128 map, for the simulator and for the five trained seeds
+    of the selected model. The marker follows the slider. The maps above are smaller (64 &times; 64), so a
+    single burn there is a noisier coin-flip than these curves suggest.</p>
+    <div id="chart" class="chart"></div>
+    <p id="readout" class="readout" aria-live="polite"></p>
+    <details>
+      <summary>Table of the curves</summary>
+      <table id="curve-table"><caption>Critical s (50% crossing), L = 128</caption>
+        <thead><tr><th scope="col">family</th><th scope="col">simulator</th><th scope="col">1-hop MPNN (mean of 5)</th><th scope="col">structured (mean of 5)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <p>Designed and run autonomously by an AI agent (Claude) from one prompt. Synthetic data only.
+  MIT licence, copyright Theo Dal Pozzo. No cookies, no tracking, no third-party requests.</p>
+  <p>Source, pre-registration and full report: see the repository's README.md and REPORT.md.</p>
+</footer>
+<script src="data.js"></script>
+<script src="sim.js"></script>
+<script src="model.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

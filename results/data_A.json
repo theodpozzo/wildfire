@@ -1,0 +1,49 @@
+{
+ "config": {
+  "family": {
+   "elev_amp": 0.0,
+   "elev_corr": 3.0,
+   "extra": {},
+   "fuel_corr": 0.0,
+   "fuel_density": 0.9,
+   "moisture_amp": 0.0,
+   "moisture_corr": 3.0,
+   "name": "A",
+   "slope_beta": 0.0,
+   "wind_ns": 1.0,
+   "wind_random_sign": false,
+   "wind_w": 0.0
+  },
+  "frames_per_trial": 6,
+  "test_frames_per_trial": 4
+ },
+ "date_utc": "2026-11-05T00:19:41Z",
+ "git_hash": "13d96c6b468369c86609d0a0cf6d02a73b8e5cd1",
+ "name": "data_A",
+ "result": {
+  "band": [
+   0.4919295452425642,
+   0.6519295452425642
+  ],
+  "band_active": 82219,
+  "band_samples": 163929,
+  "critical_s_L128": 0.5719295452425642,
+  "n_band": 545,
+  "n_test": 400,
+  "n_train": 1500,
+  "n_val": 300,
+  "range": [
+   0.27192954524256424,
+   0.8719295452425642
+  ],
+  "test_active": 47578,
+  "test_frames": 1599,
+  "test_samples": 94827,
+  "test_sha256": "166f3526ac9163506ab98367429e05670687f1e7564053a9db809e52edadfe6a",
+  "train_active": 278115,
+  "train_samples": 554086,
+  "val_active": 55342,
+  "val_samples": 110237
+ },
+ "seed": 1000
+}
