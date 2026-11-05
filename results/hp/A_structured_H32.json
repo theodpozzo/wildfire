@@ -1,0 +1,45 @@
+{
+ "config": {
+  "H": 32,
+  "batch": 2048,
+  "family": "A",
+  "kind": "structured",
+  "lr": 0.003,
+  "steps": 4000
+ },
+ "date_utc": "2026-11-05T00:28:33Z",
+ "git_hash": "1c697d0338f8384833044f184ef5d878f1c96c83",
+ "name": "hp/A_structured_H32",
+ "result": {
+  "history": [
+   {
+    "loss": 0.47742533683776855,
+    "step": 800,
+    "val_active_brier": 0.15287237186346933
+   },
+   {
+    "loss": 0.45056846737861633,
+    "step": 1600,
+    "val_active_brier": 0.15248782908119213
+   },
+   {
+    "loss": 0.4371660649776459,
+    "step": 2400,
+    "val_active_brier": 0.1524936717837828
+   },
+   {
+    "loss": 0.4632439613342285,
+    "step": 3200,
+    "val_active_brier": 0.15255595991870657
+   },
+   {
+    "loss": 0.4797568619251251,
+    "step": 4000,
+    "val_active_brier": 0.1524067047643667
+   }
+  ],
+  "train_seconds": 21.058974981307983,
+  "val_active_brier": 0.1524067047643667
+ },
+ "seed": 0
+}
