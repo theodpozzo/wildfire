@@ -8,3 +8,4 @@ checkpoints/
 logs/
 *.npz
 !tests/fixtures/*.npz
+data/

@@ -1,0 +1,57 @@
+{
+ "config": {
+  "family": {
+   "elev_amp": 0.0,
+   "elev_corr": 3.0,
+   "extra": {},
+   "fuel_corr": 0.0,
+   "fuel_density": 0.9,
+   "moisture_amp": 0.0,
+   "moisture_corr": 3.0,
+   "name": "B",
+   "slope_beta": 0.0,
+   "wind_ns": 0.6,
+   "wind_random_sign": true,
+   "wind_w": 0.5
+  },
+  "frames_per_trial": 6,
+  "test_frames_per_trial": 4
+ },
+ "date_utc": "2026-11-05T00:19:45Z",
+ "git_hash": "13d96c6b468369c86609d0a0cf6d02a73b8e5cd1",
+ "name": "data_B",
+ "result": {
+  "band": [
+   0.7311731919019201,
+   0.89117319190192
+  ],
+  "band_active": 96120,
+  "band_samples": 191706,
+  "band_windblind_active": 96120,
+  "band_windblind_samples": 191706,
+  "critical_s_L128": 0.81117319190192,
+  "n_band": 730,
+  "n_test": 400,
+  "n_train": 1500,
+  "n_val": 300,
+  "range": [
+   0.51117319190192,
+   1.0
+  ],
+  "test_active": 31352,
+  "test_frames": 1600,
+  "test_samples": 62560,
+  "test_sha256": "111e3c1a526a3aa4610e4eb9e737668c144e4edca45655a5d5b0401bf1147abf",
+  "test_windblind_active": 31352,
+  "test_windblind_samples": 62560,
+  "train_active": 181714,
+  "train_samples": 362547,
+  "train_windblind_active": 181714,
+  "train_windblind_samples": 362547,
+  "val_active": 36485,
+  "val_samples": 72783,
+  "val_windblind_active": 36485,
+  "val_windblind_samples": 72783
+ },
+ "seed": 2000
+}

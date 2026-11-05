@@ -1,0 +1,45 @@
+{
+ "config": {
+  "cpus": 4
+ },
+ "date_utc": "2026-11-05T00:27:13Z",
+ "git_hash": "13d96c6b468369c86609d0a0cf6d02a73b8e5cd1",
+ "name": "timing",
+ "result": {
+  "chosen_steps": 4000,
+  "model_rollout_batch128_L128_random_weights_s": {
+   "mpnn1": 4.05,
+   "mpnn2": 1.46,
+   "structured": 2.91
+  },
+  "note": "measured by hand on 4 vCPUs before pre-registration; see PREREGISTRATION.md",
+  "oracle_control_pilot": {
+   "A": {
+    "ci": [
+     0.5692,
+     0.5717
+    ],
+    "xc": 0.5705
+   },
+   "C": {
+    "ci": [
+     0.7138,
+     0.7175
+    ],
+    "xc": 0.7157
+   }
+  },
+  "pilot_crossing_rule_seconds": {
+   "mpnn1": 34.4,
+   "structured": 31.7
+  },
+  "sim_batch128_L128_near_critical_s": 1.16,
+  "train_ms_per_step_batch2048_H32": {
+   "logreg": 2,
+   "mpnn1": 10,
+   "mpnn2": 80,
+   "structured": 5
+  }
+ },
+ "seed": null
+}
