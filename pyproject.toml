@@ -1,0 +1,18 @@
+[project]
+name = "wildfire"
+version = "0.1.0"
+description = "Does a locally excellent learned fire model put the tipping point in the right place?"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
