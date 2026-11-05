@@ -6,6 +6,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402,F401
 import numpy as np  # noqa: E402
 
 from wildfire.io import ROOT, load_result, results_dir  # noqa: E402
@@ -64,7 +65,9 @@ def crossing(S):
             if i == len(fams) - 1:
                 ax.set_xlabel("base spread s")
             ax.set_xlim(xs[0], xs[-1])
-    fig.suptitle("Crossing curves: simulator (black, points = measured) vs each model's 5 seeds (coloured)",
+    ns = len(next(iter(S["families"].values()))["models"]["mpnn1"]["seeds"])
+    fig.suptitle(f"Crossing curves at L=128: simulator (black; points = measured) vs each model's {ns} seeds "
+                 "(coloured; dashed = trained with band data). Dotted line: simulator critical s.",
                  x=0.01, ha="left", fontsize=10)
     fig.tight_layout()
     fig.savefig(out_dir() / "crossing_curves.png", dpi=130)
@@ -92,10 +95,16 @@ def excess_vs_error(S):
                        edgecolor="#fbf8f2", lw=0.8, label=LABEL[kind], zorder=3)
         ax.axhline(0, color="#1f1b18", lw=0.6)
         ax.set_xscale("log")
+        ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
         ax.set_title(f"family {fam}  (shaded: |error| below H2 threshold {thr:.3f})", fontsize=8.5)
         ax.set_xlabel("excess active-cell Brier over Bayes floor (off-band test)")
         ax.set_ylabel("critical s error (model - simulator)")
-    axes[-1].legend(fontsize=7, frameon=False, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    handles = {}
+    for ax in axes:
+        for h, lab in zip(*ax.get_legend_handles_labels(), strict=True):
+            handles.setdefault(lab, h)
+    axes[-1].legend(handles.values(), handles.keys(), fontsize=7, frameon=False, loc="center left",
+                    bbox_to_anchor=(1.0, 0.5))
     fig.tight_layout()
     fig.savefig(out_dir() / "excess_vs_error.png", dpi=130)
     plt.close(fig)

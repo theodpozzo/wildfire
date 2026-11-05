@@ -113,7 +113,7 @@ def model_table(d: Doc, S, fam):
     d.w()
 
 
-def report(S) -> Doc:
+def report(S, base: Path | None = None) -> Doc:
     d = Doc()
     H = S["H"]
     G = S["gates"]
@@ -128,7 +128,7 @@ def report(S) -> Doc:
         f"{d.n(e)} of the {d.n(t)} were locally excellent; "
         f"{d.n(H['H2']['excellent_and_ci_separated'])} excellent seeds had a critical-s CI that did not overlap the "
         f"simulator's, but an error below the size threshold). "
-        f"Judged per model instead (mean over 5 seeds), {d.n(H['H2']['per_model_passes'])} of "
+        f"Judged per model instead (mean over {d.n(S['n_seeds'])} seeds), {d.n(H['H2']['per_model_passes'])} of "
         f"{d.n(len(H['H2']['per_model']))} model-family pairs pass.")
     d.w()
     d.w("![Excess Brier against critical-s error](figures/excess_vs_error.png)")
@@ -169,8 +169,8 @@ def report(S) -> Doc:
     d.w("- **Models** see raw fields only (s, fuel, moisture, elevation, wind vector, cell state), never q or its "
         "factors. Generic MPNNs (1-hop, 2-hop), a wind-blind 1-hop control in B, and a structured model that "
         "predicts one probability per directed edge and combines them as 1 - prod(1 - q). **The structured model "
-        "has the true functional form by construction.** 5 seeds each; hidden size chosen on validation Brier "
-        "only. Trained with NumPy and hand-written gradients (PyTorch could not be installed here).")
+        f"has the true functional form by construction.** {d.n(S['n_seeds'])} seeds each; hidden size chosen on "
+        "validation Brier only. Trained with NumPy and hand-written gradients (PyTorch could not be installed here).")
     d.w("- **Locally excellent** = excess active-cell Brier over the Bayes floor at most 0.002 on the off-band test "
         "set. Excess = mean (p_model - p_true)^2 over active cells, where p_true comes from the simulator's q.")
     d.w("- **Rollouts**: masked (only active cells may ignite) at L=128 on fresh simulator landscapes, with an "
@@ -249,8 +249,9 @@ def report(S) -> Doc:
                 f"{d.n(c['oracle_xc'], 4)} {d.ci(*c['oracle_ci'], nd=4)} vs simulator "
                 f"{d.n(S['families'][f]['truth']['L128']['xc'], 4)}.")
         d.w()
-        d.w("Unmasked rollouts (seed 0, 16 fires at the simulator's critical s): rate of ignitions of cells with no "
-            "burning neighbour, per non-active cell-step.")
+        d.w(f"Unmasked rollouts (seed 0, {d.n(S['n_unmasked'])} fires at the simulator's critical s, at most 300 "
+            "steps): rate of ignitions of cells with no burning neighbour, per non-active cell-step. The structured "
+            "model is zero by construction.")
         d.w()
         d.w("| family | " + " | ".join(LABEL[k] for k in ORDER[2:]) + " |")
         d.w("|---|" + "---|" * len(ORDER[2:]))
@@ -267,7 +268,7 @@ def report(S) -> Doc:
             d.w(f"- **Wind-blind control (B)**: critical s {d.n(M['xc']['mean'])} {d.ci(M['xc']['lo'], M['xc']['hi'])}, "
                 f"error {d.n(M['err']['mean'], sign=True)}; off-band excess {d.n(M['offband_excess']['mean'], 5)}.")
     d.w()
-    embers(d)
+    embers(d, base)
     d.w(Path(ROOT / "docs_src" / "report_tail.md").read_text().rstrip())
     return d
 
@@ -278,21 +279,43 @@ def format_sci(d: Doc, x):
     return s
 
 
-def embers(d: Doc):
-    p = ROOT / "results" / "embers.json"
+def embers(d: Doc, base: Path | None = None):
+    base = base or ROOT / "results"
     d.w("## Embers (exploratory, not confirmatory)")
     d.w()
-    if not p.exists():
+    p1, p2 = base / "ember_e1.json", base / "ember_e2.json"
+    if not p1.exists() and not p2.exists():
         d.w("No exploratory follow-ups were run.")
         d.w()
         return
-    E = json.loads(p.read_text())["result"]
-    for e in E["experiments"]:
-        d.w(f"**{e['title']}** (exploratory). Hypothesis: {e['hypothesis']}")
+    d.w("Hypotheses for these were written in EMBERS.md and committed before they ran. They were chosen after "
+        "seeing H1-H5, so they are exploratory.")
+    d.w()
+    if p1.exists():
+        E = json.loads(p1.read_text())["result"]
+        d.w(f"**E1 - signed bias, not squared error, tracks the tipping-point error: "
+            f"{'supported' if E['supported'] else 'not supported'}.** Across {d.n(E['n'])} GNN seeds, the error "
+            f"predicted from each model's mean relative bias on in-band test cells (-sc x bias) correlates with the "
+            f"measured critical-s error at Pearson r = {d.n(E['pearson_pred_vs_err'], 2)} (slope "
+            f"{d.n(E['slope'], 2)}), while off-band excess Brier and |error| have Spearman rho = "
+            f"{d.n(E['spearman_excess_vs_abs_err'], 2)}.")
         d.w()
-        for line in e["lines"]:
-            d.w("- " + line["text"].format(*[d.n(v, line.get("nd", 3)) for v in line["values"]]))
+    if p2.exists():
+        E = json.loads(p2.read_text())["result"]
+        d.w(f"**E2 - the same models at L={d.n(E['L'])}.** For each family, the seed-0 default-data GNN with the "
+            f"largest L=128 error:")
         d.w()
+        d.w("| family | model | simulator critical s | model critical s | error | error at L=128 | 10-90% width | "
+            "width at L=128 |")
+        d.w("|---|---|---|---|---|---|---|---|")
+        for f, r in E["families"].items():
+            d.w(f"| {f} | {LABEL[r['kind']]} | {d.n(r['truth_xc'], 4)} {d.ci(*r['truth_ci'], nd=4)} | "
+                f"{d.n(r['model_xc'], 4)} {d.ci(*r['model_ci'], nd=4)} | {d.n(r['err'], 4, sign=True)} | "
+                f"{d.n(r['err_128'], 4, sign=True)} | {d.n(r['truth_width'], 4)} | {d.n(r['truth_width_128'], 4)} |")
+        d.w()
+        if "verdict" in E:
+            d.w(E["verdict"])
+            d.w()
 
 
 def readme(S) -> Doc:
@@ -334,7 +357,7 @@ def readme(S) -> Doc:
 
 def render(base: Path | None = None) -> dict[str, Doc]:
     S = load_result("summary", base)["result"]
-    return {"REPORT.md": report(S), "README.md": readme(S)}
+    return {"REPORT.md": report(S, base), "README.md": readme(S)}
 
 
 if __name__ == "__main__":

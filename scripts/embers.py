@@ -84,6 +84,15 @@ def e2():
             "err": None if cr.get("xc") is None else cr["xc"] - gt["xc"], "err_128": e128,
         }
         print(fam, out["families"][fam], flush=True)
+    ok = []
+    for r in out["families"].values():
+        persists = r["err"] is not None and abs(r["err"]) >= 0.5 * abs(r["err_128"])
+        narrows = r["truth_width"] <= 0.75 * r["truth_width_128"]
+        r["error_persists"], r["width_narrows"] = bool(persists), bool(narrows)
+        ok.append(persists and narrows)
+    out["supported"] = bool(all(ok))
+    out["verdict"] = ("Pre-stated criterion (each error at least half its L=128 size, each simulator width at "
+                      "most three quarters of its L=128 size): " + ("supported." if all(ok) else "not supported."))
     return out
 
 

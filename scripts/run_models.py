@@ -21,7 +21,7 @@ from wildfire.families import FAMILIES
 from wildfire.io import ROOT, load_result, results_dir, save_result, smoke
 
 DATA = ROOT / "data" if not smoke() else results_dir() / "data"
-SEEDS = [0, 1, 2] if smoke() else [0, 1, 2, 3, 4]
+SEEDS = [0, 1] if smoke() else [0, 1, 2, 3, 4]
 H_GRID = [16, 32]
 STEPS = 300 if smoke() else int(os.environ.get("WILDFIRE_STEPS", "4000"))
 LR = 3e-3

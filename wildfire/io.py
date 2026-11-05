@@ -28,6 +28,14 @@ def results_dir() -> Path:
     return d
 
 
+def _np_default(o):
+    if hasattr(o, "item"):
+        return o.item()
+    if hasattr(o, "tolist"):
+        return o.tolist()
+    raise TypeError(type(o))
+
+
 def save_result(name: str, payload: dict, seed, config: dict) -> Path:
     out = {
         "name": name,
@@ -39,7 +47,7 @@ def save_result(name: str, payload: dict, seed, config: dict) -> Path:
     }
     p = results_dir() / f"{name}.json"
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(out, indent=1, sort_keys=True))
+    p.write_text(json.dumps(out, indent=1, sort_keys=True, default=_np_default))
     return p
 
 

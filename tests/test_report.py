@@ -43,7 +43,7 @@ def test_numbers_match_json():
 
     S = json.loads((ROOT / "results" / "summary.json").read_text())["result"]
     rep = (ROOT / "REPORT.md").read_text()
-    for f, F in S["families"].items():
+    for F in S["families"].values():
         assert f"{F['truth']['L128']['xc']:.4f}" in rep
         assert f"{F['models']['mpnn1']['xc']['mean']:.3f}" in rep
     assert f"{S['H']['H2']['passes']} of {S['H']['H2']['tried']}" in rep

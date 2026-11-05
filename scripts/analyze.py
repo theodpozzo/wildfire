@@ -45,7 +45,9 @@ def main():
     summary["gates"] = {g: {k: gates[g][k] for k in ("xc", "ci", "target", "pass", "width_10_90")}
                         | {"n_values": len(gates[g]["x"]), "n_per": gates[g]["n"][0]} for g in gates}
     try:
-        controls = load_result("controls")["result"]
+        _c = load_result("controls")
+        controls = _c["result"]
+        n_unmasked = _c["config"]["n_unmasked"]
     except FileNotFoundError:
         controls = None
     fams = {}
@@ -96,9 +98,11 @@ def main():
     if controls:
         summary["controls"] = {f: {"oracle_xc": controls[f]["oracle"]["xc"], "oracle_ci": controls[f]["oracle"]["ci"],
                                    "unmasked": controls[f]["unmasked"]} for f in controls}
+        summary["n_unmasked"] = n_unmasked
+    summary["n_seeds"] = len(SEEDS)
     summary["H"] = hypotheses(fams)
     save_result("summary", summary, None, {"seeds": SEEDS})
-    print(json.dumps(summary["H"], indent=1)[:4000])
+    print(json.dumps(summary["H"], indent=1, default=lambda o: o.item())[:3000])
 
 
 def _slim(test):
