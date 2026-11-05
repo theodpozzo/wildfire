@@ -90,8 +90,8 @@ def plain_terms(S, d: Doc) -> list[str]:
     thr = ", ".join(f"{f} {d.n(F['h2_threshold'], 3)}" for f, F in S["families"].items())
     out.append(f"Every eligible GNN seed was locally excellent: off-band excess Brier between {d.n(min(exc), 5)} and "
                f"{d.n(max(exc), 5)}, against a margin of 0.002. Their tipping points all landed within "
-               f"{d.n(big, 3)} of the simulator's, inside the pre-registered thresholds (half the 10-90% transition "
-               f"width: {thr}).")
+               f"{d.n(big, 3)} of the simulator's, each inside its family's pre-registered threshold (half the 10-90% "
+               f"transition width: {thr}).")
     out.append(f"The misses are small but real: in {d.n(H2['excellent_and_ci_separated'])} of {d.n(H2['tried'])} "
                f"seeds the model's 95% interval for critical s did not overlap the simulator's. So the answer to "
                f"\"can it be off?\" is yes, measurably; to \"can it be off by a meaningful fraction of the "
@@ -362,15 +362,31 @@ def embers(d: Doc, base: Path | None = None):
             f"largest L=128 error:")
         d.w()
         d.w("| family | model | simulator critical s | model critical s | error | error at L=128 | 10-90% width | "
-            "width at L=128 |")
-        d.w("|---|---|---|---|---|---|---|---|")
+            "width at L=128 | abs(error) / half width | same at L=128 |")
+        d.w("|---|---|---|---|---|---|---|---|---|---|")
         for f, r in E["families"].items():
             d.w(f"| {f} | {LABEL[r['kind']]} | {d.n(r['truth_xc'], 4)} {d.ci(*r['truth_ci'], nd=4)} | "
                 f"{d.n(r['model_xc'], 4)} {d.ci(*r['model_ci'], nd=4)} | {d.n(r['err'], 4, sign=True)} | "
-                f"{d.n(r['err_128'], 4, sign=True)} | {d.n(r['truth_width'], 4)} | {d.n(r['truth_width_128'], 4)} |")
+                f"{d.n(r['err_128'], 4, sign=True)} | {d.n(r['truth_width'], 4)} | {d.n(r['truth_width_128'], 4)} | "
+                f"{d.n(abs(r['err']) / (r['truth_width'] / 2), 2)} | {d.n(abs(r['err_128']) / (r['truth_width_128'] / 2), 2)} |")
         d.w()
         if "verdict" in E:
-            d.w(E["verdict"])
+            grew = [f for f, r in E["families"].items()
+                    if abs(r["err"]) / r["truth_width"] > abs(r["err_128"]) / r["truth_width_128"]]
+            fell = [f for f in E["families"] if f not in grew]
+            txt = E["verdict"]
+            if grew:
+                txt += (f" In {', '.join(grew)} the miss stayed roughly fixed in s while the simulator's transition "
+                        "narrowed, so the same miss is a larger fraction of the transition on the bigger map.")
+            if fell:
+                txt += (f" In {', '.join(fell)} the error itself shrank enough that its share of the transition "
+                        "did not grow.")
+            if all(abs(r["err"]) <= max(0.01, r["truth_width"] / 2) for r in E["families"].values()):
+                txt += (" None of these crosses the H2 size criterion at this L; whether they would at larger L "
+                        "was not tested.")
+            else:
+                txt += " At least one now exceeds the H2 size criterion (exploratory, single seed)."
+            d.w(txt)
             d.w()
 
 
@@ -382,9 +398,13 @@ def readme(S) -> Doc:
     d.w()
     d.w("> This is a simplified, synthetic simulation. It must never inform real fire or evacuation decisions.")
     d.w()
+    for line in plain_terms(S, d):
+        d.w("- " + line)
+    d.w()
+    d.w("![Excess Brier against critical-s error](figures/excess_vs_error.png)")
+    d.w()
     d.w("This repository was designed and run autonomously by an AI agent, Claude, from a single prompt: the "
-        "simulator, the experiments, the pre-registration, the analysis, this text and the demo. No human edited "
-        "the results.")
+        "simulator, the experiments, the pre-registration, the analysis, this text and the demo.")
     d.w()
     d.w("A fire on a grid either dies out or crosses the map, and a small change in the base spread control s "
         "decides which. The simulator's tipping point (critical s, 50% crossing at L=128) was measured, then graph "

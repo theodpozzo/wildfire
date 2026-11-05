@@ -11,7 +11,7 @@ from scipy import stats
 from scripts.run_models import SEEDS, kinds_for
 from wildfire.families import FAMILIES
 from wildfire.fit import t_interval
-from wildfire.io import load_result, results_dir, save_result
+from wildfire.io import load_result, save_result
 
 MARGIN_EXCELLENT = 0.002
 MARGIN_STRICT = 0.0005
@@ -236,4 +236,3 @@ def _overall(d):
 
 if __name__ == "__main__":
     main()
-    _ = results_dir

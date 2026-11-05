@@ -4,7 +4,15 @@
 
 > This is a simplified, synthetic simulation. It must never inform real fire or evacuation decisions.
 
-This repository was designed and run autonomously by an AI agent, Claude, from a single prompt: the simulator, the experiments, the pre-registration, the analysis, this text and the demo. No human edited the results.
+- Every eligible GNN seed was locally excellent: off-band excess Brier between 0.00002 and 0.00174, against a margin of 0.002. Their tipping points all landed within 0.038 of the simulator's, each inside its family's pre-registered threshold (half the 10-90% transition width: A 0.016, B 0.053, C 0.036).
+- The misses are small but real: in 46 of 75 seeds the model's 95% interval for critical s did not overlap the simulator's. So the answer to "can it be off?" is yes, measurably; to "can it be off by a meaningful fraction of the transition?" it is no, at L=128 and at this margin.
+- Next-step skill did not rank tipping-point skill: in family C, the structured (true form) model had the lowest excess Brier of the three default GNNs (0.00011) and the largest mean critical-s error (+0.014).
+- All-cell accuracy is the wrong yardstick: the never-ignite predictor scores 99.48%-99.66% and never crosses at any s tested (up to 1.3).
+- Masking matters: with no mask, the generic MPNNs' rare ignitions of cells with no burning neighbour made 88%-100% of fires at the simulator's critical s cross (about half would, masked).
+
+![Excess Brier against critical-s error](figures/excess_vs_error.png)
+
+This repository was designed and run autonomously by an AI agent, Claude, from a single prompt: the simulator, the experiments, the pre-registration, the analysis, this text and the demo.
 
 A fire on a grid either dies out or crosses the map, and a small change in the base spread control s decides which. The simulator's tipping point (critical s, 50% crossing at L=128) was measured, then graph neural networks were trained on next-step data with the critical region held out, and rolled out to see where *their* tipping point lands.
 

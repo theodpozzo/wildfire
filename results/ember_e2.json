@@ -1,0 +1,71 @@
+{
+ "config": {},
+ "date_utc": "2026-11-05T02:01:08Z",
+ "git_hash": "b97e1288e80fcce766f136145f403938b8dcb6e3-dirty",
+ "name": "ember_e2",
+ "result": {
+  "L": 256,
+  "families": {
+   "A": {
+    "err": 0.008825614564538786,
+    "err_128": 0.009335569583505676,
+    "error_persists": true,
+    "kind": "mpnn2",
+    "model_ci": [
+     0.5800668609406949,
+     0.5816200165680697
+    ],
+    "model_xc": 0.580853223403031,
+    "truth_ci": [
+     0.5714266547263347,
+     0.5725609505311726
+    ],
+    "truth_width": 0.0204086169203637,
+    "truth_width_128": 0.032359747201055,
+    "truth_xc": 0.5720276088384922,
+    "width_narrows": true
+   },
+   "B": {
+    "err": -0.012840836706101144,
+    "err_128": -0.0201925251726911,
+    "error_persists": true,
+    "kind": "mpnn1",
+    "model_ci": [
+     0.7910016659440381,
+     0.7960497111955618
+    ],
+    "model_xc": 0.7934737408998375,
+    "truth_ci": [
+     0.8044938350644903,
+     0.8083267046751276
+    ],
+    "truth_width": 0.07776459498427606,
+    "truth_width_128": 0.10660111891994627,
+    "truth_xc": 0.8063145776059386,
+    "width_narrows": true
+   },
+   "C": {
+    "err": 0.015077471405241072,
+    "err_128": 0.014676006520190965,
+    "error_persists": true,
+    "kind": "mpnn1",
+    "model_ci": [
+     0.7311854212609291,
+     0.7347028973109613
+    ],
+    "model_xc": 0.733025739835758,
+    "truth_ci": [
+     0.7166158250195106,
+     0.7192186059752552
+    ],
+    "truth_width": 0.04777602607035137,
+    "truth_width_128": 0.07276627803144038,
+    "truth_xc": 0.717948268430517,
+    "width_narrows": true
+   }
+  },
+  "supported": true,
+  "verdict": "Pre-stated criterion (each error at least half its L=128 size, each simulator width at most three quarters of its L=128 size): supported."
+ },
+ "seed": 91000
+}

@@ -4,7 +4,7 @@
 
 No, not by the pre-registered standard: none of the 75 trained GNN seeds was both locally excellent and off by more than the threshold with non-overlapping intervals. The largest critical-s error among locally excellent seeds was -0.038 (generic MPNN, 1-hop, family B).
 
-- Every eligible GNN seed was locally excellent: off-band excess Brier between 0.00002 and 0.00174, against a margin of 0.002. Their tipping points all landed within 0.038 of the simulator's, inside the pre-registered thresholds (half the 10-90% transition width: A 0.016, B 0.053, C 0.036).
+- Every eligible GNN seed was locally excellent: off-band excess Brier between 0.00002 and 0.00174, against a margin of 0.002. Their tipping points all landed within 0.038 of the simulator's, each inside its family's pre-registered threshold (half the 10-90% transition width: A 0.016, B 0.053, C 0.036).
 - The misses are small but real: in 46 of 75 seeds the model's 95% interval for critical s did not overlap the simulator's. So the answer to "can it be off?" is yes, measurably; to "can it be off by a meaningful fraction of the transition?" it is no, at L=128 and at this margin.
 - Next-step skill did not rank tipping-point skill: in family C, the structured (true form) model had the lowest excess Brier of the three default GNNs (0.00011) and the largest mean critical-s error (+0.014).
 - All-cell accuracy is the wrong yardstick: the never-ignite predictor scores 99.48%-99.66% and never crosses at any s tested (up to 1.3).
@@ -157,6 +157,16 @@ Hypotheses for these were written in EMBERS.md and committed before they ran. Th
 **E1 - signed bias, not squared error, tracks the tipping-point error: supported.** Across 75 GNN seeds, the error predicted from each model's mean relative bias on in-band test cells (-sc x bias) correlates with the measured critical-s error at Pearson r = 0.80 (slope 1.96), while off-band excess Brier and |error| have Spearman rho = 0.48. The slope is near the top of the stated range, so the simple rescaling argument underestimates the shift. The clearest outliers are family B's 1-hop MPNNs: under wind, errors can cancel in a mean while still distorting the direction-dependent spread.
 
 ![E1: signed bias vs squared error](figures/ember_e1_bias.png)
+
+**E2 - the same models at L=256.** For each family, the seed-0 default-data GNN with the largest L=128 error:
+
+| family | model | simulator critical s | model critical s | error | error at L=128 | 10-90% width | width at L=128 | abs(error) / half width | same at L=128 |
+|---|---|---|---|---|---|---|---|---|---|
+| A | generic MPNN, 2-hop | 0.5720 (0.5714, 0.5726) | 0.5809 (0.5801, 0.5816) | +0.0088 | +0.0093 | 0.0204 | 0.0324 | 0.86 | 0.58 |
+| B | generic MPNN, 1-hop | 0.8063 (0.8045, 0.8083) | 0.7935 (0.7910, 0.7960) | -0.0128 | -0.0202 | 0.0778 | 0.1066 | 0.33 | 0.38 |
+| C | generic MPNN, 1-hop | 0.7179 (0.7166, 0.7192) | 0.7330 (0.7312, 0.7347) | +0.0151 | +0.0147 | 0.0478 | 0.0728 | 0.63 | 0.40 |
+
+Pre-stated criterion (each error at least half its L=128 size, each simulator width at most three quarters of its L=128 size): supported. In A, C the miss stayed roughly fixed in s while the simulator's transition narrowed, so the same miss is a larger fraction of the transition on the bigger map. In B the error itself shrank enough that its share of the transition did not grow. None of these crosses the H2 size criterion at this L; whether they would at larger L was not tested.
 
 ## Limitations
 
