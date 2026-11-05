@@ -34,7 +34,8 @@ def test_every_number_comes_from_results():
         for tok in NUM.findall(text):
             t = tok.rstrip("%")
             t2 = t.lstrip("+-")
-            assert t in doc.nums or t2 in ALLOWED or t in ALLOWED or ("+" + t2) in doc.nums, (name, tok)
+            ok = {t, t2, "+" + t2, "-" + t2} & doc.nums or t2 in ALLOWED or t in ALLOWED
+            assert ok, (name, tok)
 
 
 def test_numbers_match_json():

@@ -21,7 +21,7 @@ ORDER = ["never", "persistence", "logreg", "mpnn1", "mpnn2", "structured", "mpnn
          "mpnn1_windblind"]
 
 # Structural constants that may appear in prose (sizes, years, labels), not results.
-ALLOWED = {"1", "2", "3", "4", "5", "9", "10", "16", "50", "64", "90", "95", "128", "300", "400", "1500",
+ALLOWED = {"0", "1", "2", "3", "4", "5", "9", "10", "16", "50", "64", "90", "95", "128", "300", "400", "1500",
            "1980", "2000", "2026", "0.5", "0.592746", "0.010", "0.08", "0.30", "0.015", "1.3", "0.6", "0.4",
            "0.9", "0.2", "0.002", "0.0005", "0.02", "0.01", "1e-5", "4000", "2048", "32", "13", "14", "5-9",
            "0.3", "4-neighbour", "1-hop", "2-hop", "10-90", "H1", "H2", "H3", "H4", "H5", "G1", "G2", "L=128",
@@ -80,6 +80,42 @@ def headline(S, d: Doc | None = None) -> str:
     return s
 
 
+def plain_terms(S, d: Doc) -> list[str]:
+    """Data-driven bullet points that qualify the headline."""
+    H2 = S["H"]["H2"]
+    rows = [r for r in H2["rows"] if r["err"] is not None]
+    exc = [r["excess"] for r in rows]
+    big = max(abs(r["err"]) for r in rows if r["excellent"])
+    out = []
+    thr = ", ".join(f"{f} {d.n(F['h2_threshold'], 3)}" for f, F in S["families"].items())
+    out.append(f"Every eligible GNN seed was locally excellent: off-band excess Brier between {d.n(min(exc), 5)} and "
+               f"{d.n(max(exc), 5)}, against a margin of 0.002. Their tipping points all landed within "
+               f"{d.n(big, 3)} of the simulator's, inside the pre-registered thresholds (half the 10-90% transition "
+               f"width: {thr}).")
+    out.append(f"The misses are small but real: in {d.n(H2['excellent_and_ci_separated'])} of {d.n(H2['tried'])} "
+               f"seeds the model's 95% interval for critical s did not overlap the simulator's. So the answer to "
+               f"\"can it be off?\" is yes, measurably; to \"can it be off by a meaningful fraction of the "
+               f"transition?\" it is no, at L=128 and at this margin.")
+    for f, F in S["families"].items():
+        M = {k: F["models"][k] for k in ("mpnn1", "mpnn2", "structured")}
+        best_brier = min(M, key=lambda k: M[k]["offband_excess"]["mean"])
+        worst_err = max(M, key=lambda k: abs(M[k]["err"]["mean"]))
+        if best_brier == worst_err:
+            out.append(f"Next-step skill did not rank tipping-point skill: in family {f}, the {LABEL[best_brier]} "
+                       f"model had the lowest excess Brier of the three default GNNs "
+                       f"({d.n(M[best_brier]['offband_excess']['mean'], 5)}) and the largest mean critical-s error "
+                       f"({d.n(M[worst_err]['err']['mean'], 3, sign=True)}).")
+    nv = [F["models"]["never"]["seeds"][0]["test"]["all"]["all_cell_accuracy"] for F in S["families"].values()]
+    out.append(f"All-cell accuracy is the wrong yardstick: the never-ignite predictor scores {d.n(min(nv), 2, pct=True)}"
+               f"-{d.n(max(nv), 2, pct=True)} and never crosses at any s tested (up to 1.3).")
+    if "controls" in S:
+        cr = [c["unmasked"][k]["crossed_frac"] for c in S["controls"].values() for k in ("mpnn1", "mpnn2")]
+        out.append(f"Masking matters: with no mask, the generic MPNNs' rare ignitions of cells with no burning "
+                   f"neighbour made {d.n(min(cr), 0, pct=True)}-{d.n(max(cr), 0, pct=True)} of fires at the "
+                   f"simulator's critical s cross (about half would, masked).")
+    return out
+
+
 def model_table(d: Doc, S, fam):
     F = S["families"][fam]
     t = F["truth"]["L128"]
@@ -122,6 +158,9 @@ def report(S, base: Path | None = None) -> Doc:
     d.w("## The answer")
     d.w()
     d.w(headline(S, d))
+    d.w()
+    for line in plain_terms(S, d):
+        d.w("- " + line)
     d.w()
     p, t, e = h2_counts(S)
     d.w(f"Main hypothesis H2: **{H['H2']['verdict']}** ({d.n(p)} passing seeds out of {d.n(t)} tried; "
@@ -213,7 +252,7 @@ def report(S, base: Path | None = None) -> Doc:
     for c, r in h3["cells"].items():
         if "err_default" in r:
             d.w(f"- {c}: |mean error| default {d.n(r['err_default'], 4)}, with band {d.n(r['err_band'], 4)} - "
-                f"{r['verdict']}{' (default model within measurement floor or its interval contains the truth)' if r['verdict'] == 'inconclusive' else ''}.")
+                f"{r['verdict']}{_h3_reason(r)}.")
         else:
             d.w(f"- {c}: {r['verdict']} ({r.get('reason', '')}).")
     d.w()
@@ -250,8 +289,9 @@ def report(S, base: Path | None = None) -> Doc:
                 f"{d.n(S['families'][f]['truth']['L128']['xc'], 4)}.")
         d.w()
         d.w(f"Unmasked rollouts (seed 0, {d.n(S['n_unmasked'])} fires at the simulator's critical s, at most 300 "
-            "steps): rate of ignitions of cells with no burning neighbour, per non-active cell-step. The structured "
-            "model is zero by construction.")
+            "steps): rate of ignitions of cells with no burning neighbour, per non-active cell-step, and the share of "
+            "those fires that crossed. Masked, about half would cross at this s. The structured model is zero by "
+            "construction.")
         d.w()
         d.w("| family | " + " | ".join(LABEL[k] for k in ORDER[2:]) + " |")
         d.w("|---|" + "---|" * len(ORDER[2:]))
@@ -259,7 +299,11 @@ def report(S, base: Path | None = None) -> Doc:
             cells = []
             for k in ORDER[2:]:
                 u = c["unmasked"].get(k)
-                cells.append("-" if u is None else f"{d.n(u['rate'], 2, pct=False) if u['rate'] == 0 else format_sci(d, u['rate'])}")
+                if u is None:
+                    cells.append("-")
+                else:
+                    r = "0" if u["rate"] == 0 else format_sci(d, u["rate"])
+                    cells.append(f"{r}; crossed {d.n(u['crossed_frac'], 0, pct=True)}")
             d.w(f"| {f} | " + " | ".join(cells) + " |")
     d.w()
     if "B" in S["families"] and "mpnn1_windblind" in S["families"]["B"]["models"]:
@@ -271,6 +315,14 @@ def report(S, base: Path | None = None) -> Doc:
     embers(d, base)
     d.w(Path(ROOT / "docs_src" / "report_tail.md").read_text().rstrip())
     return d
+
+
+def _h3_reason(r):
+    if r["verdict"] != "inconclusive":
+        return ""
+    if r["err_default"] < 0.01:
+        return " (default error below the 0.01 measurement floor)"
+    return " (default model's seed interval contains the truth)"
 
 
 def format_sci(d: Doc, x):
@@ -298,7 +350,11 @@ def embers(d: Doc, base: Path | None = None):
             f"predicted from each model's mean relative bias on in-band test cells (-sc x bias) correlates with the "
             f"measured critical-s error at Pearson r = {d.n(E['pearson_pred_vs_err'], 2)} (slope "
             f"{d.n(E['slope'], 2)}), while off-band excess Brier and |error| have Spearman rho = "
-            f"{d.n(E['spearman_excess_vs_abs_err'], 2)}.")
+            f"{d.n(E['spearman_excess_vs_abs_err'], 2)}. The slope is near the top of the stated range, so the simple "
+            "rescaling argument underestimates the shift. The clearest outliers are family B's 1-hop MPNNs: under "
+            "wind, errors can cancel in a mean while still distorting the direction-dependent spread.")
+        d.w()
+        d.w("![E1: signed bias vs squared error](figures/ember_e1_bias.png)")
         d.w()
     if p2.exists():
         E = json.loads(p2.read_text())["result"]

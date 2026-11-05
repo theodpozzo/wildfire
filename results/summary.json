@@ -8,8 +8,8 @@
    4
   ]
  },
- "date_utc": "2026-11-05T01:42:43Z",
- "git_hash": "5880bdef7290b3d584c68e7af84e9215fd2ad4ef",
+ "date_utc": "2026-11-05T01:55:19Z",
+ "git_hash": "d29ddc949be5363b50fbd57d53668dbf7362f179-dirty",
  "name": "summary",
  "result": {
   "H": {
@@ -1126,6 +1126,168 @@
      }
     },
     "verdict": "not supported"
+   }
+  },
+  "controls": {
+   "A": {
+    "oracle_ci": [
+     0.5703361768581136,
+     0.572907565390393
+    ],
+    "oracle_xc": 0.571547177344685,
+    "unmasked": {
+     "logreg": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 287075,
+      "rate": 0.009053383262213707,
+      "spurious_ignitions": 2599,
+      "steps": 3
+     },
+     "mpnn1": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 6084307,
+      "rate": 2.021594242368112e-05,
+      "spurious_ignitions": 123,
+      "steps": 52
+     },
+     "mpnn1_band": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 9794112,
+      "rate": 1.1639646350787084e-05,
+      "spurious_ignitions": 114,
+      "steps": 130
+     },
+     "mpnn2": {
+      "crossed_frac": 0.875,
+      "nonactive_cell_steps": 12231163,
+      "rate": 1.6351674816205132e-06,
+      "spurious_ignitions": 20,
+      "steps": 190
+     },
+     "structured": {
+      "crossed_frac": 0.4375,
+      "nonactive_cell_steps": 36797133,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 300
+     },
+     "structured_band": {
+      "crossed_frac": 0.3125,
+      "nonactive_cell_steps": 35144452,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 300
+     }
+    }
+   },
+   "B": {
+    "oracle_ci": [
+     0.8068104252079712,
+     0.81199024809552
+    ],
+    "oracle_xc": 0.8094550053495382,
+    "unmasked": {
+     "logreg": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 286773,
+      "rate": 0.009087326910134497,
+      "spurious_ignitions": 2606,
+      "steps": 3
+     },
+     "mpnn1": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 5356544,
+      "rate": 4.2751445708277575e-05,
+      "spurious_ignitions": 229,
+      "steps": 94
+     },
+     "mpnn1_band": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 4867972,
+      "rate": 3.594926182812884e-05,
+      "spurious_ignitions": 175,
+      "steps": 43
+     },
+     "mpnn1_windblind": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 3611180,
+      "rate": 6.009116133784525e-05,
+      "spurious_ignitions": 217,
+      "steps": 29
+     },
+     "mpnn2": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 11463782,
+      "rate": 3.402018635734699e-06,
+      "spurious_ignitions": 39,
+      "steps": 168
+     },
+     "structured": {
+      "crossed_frac": 0.5625,
+      "nonactive_cell_steps": 38501039,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 255
+     },
+     "structured_band": {
+      "crossed_frac": 0.4375,
+      "nonactive_cell_steps": 38095792,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 275
+     }
+    }
+   },
+   "C": {
+    "oracle_ci": [
+     0.7147473722493897,
+     0.7187699374479578
+    ],
+    "oracle_xc": 0.7166444370021431,
+    "unmasked": {
+     "logreg": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 287325,
+      "rate": 0.010301922909597146,
+      "spurious_ignitions": 2960,
+      "steps": 2
+     },
+     "mpnn1": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 5042689,
+      "rate": 2.677143087745447e-05,
+      "spurious_ignitions": 135,
+      "steps": 95
+     },
+     "mpnn1_band": {
+      "crossed_frac": 1.0,
+      "nonactive_cell_steps": 6308340,
+      "rate": 2.2985444665316074e-05,
+      "spurious_ignitions": 145,
+      "steps": 108
+     },
+     "mpnn2": {
+      "crossed_frac": 0.875,
+      "nonactive_cell_steps": 18559057,
+      "rate": 1.5086973438359502e-06,
+      "spurious_ignitions": 28,
+      "steps": 260
+     },
+     "structured": {
+      "crossed_frac": 0.25,
+      "nonactive_cell_steps": 31635967,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 300
+     },
+     "structured_band": {
+      "crossed_frac": 0.1875,
+      "nonactive_cell_steps": 31970652,
+      "rate": 0.0,
+      "spurious_ignitions": 0,
+      "steps": 300
+     }
+    }
    }
   },
   "families": {
@@ -30680,6 +30842,7 @@
    "strict": 0.0005
   },
   "n_seeds": 5,
+  "n_unmasked": 16,
   "prereg_commit": "1c697d0338f8384833044f184ef5d878f1c96c83"
  },
  "seed": null

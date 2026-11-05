@@ -131,11 +131,44 @@ def accuracy_trap(S):
     plt.close(fig)
 
 
+def ember_e1():
+    p = results_dir() / "ember_e1.json"
+    if not p.exists():
+        return
+    import json
+
+    E = json.loads(p.read_text())["result"]
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.6))
+    for r in E["rows"]:
+        c = COL.get(r["kind"].replace("_band", ""), "#888")
+        mk = {"A": "o", "B": "s", "C": "^"}[r["family"]]
+        axes[0].scatter(r["pred_err"], r["err"], color=c, marker=mk, s=22, edgecolor="#fbf8f2", lw=0.6)
+        axes[1].scatter(r["excess"], abs(r["err"]), color=c, marker=mk, s=22, edgecolor="#fbf8f2", lw=0.6)
+    lim = max(abs(x) for r in E["rows"] for x in (r["pred_err"], r["err"])) * 1.1
+    axes[0].plot([-lim, lim], [-lim, lim], color="#9a948c", lw=0.8, ls=":")
+    axes[0].set_xlabel("predicted error = -sc x relative bias (in-band test cells)")
+    axes[0].set_ylabel("measured critical s error")
+    axes[0].set_title(f"E1 (exploratory): signed bias, Pearson r = {E['pearson_pred_vs_err']:.2f}", fontsize=8.5)
+    axes[1].set_xscale("log")
+    axes[1].set_xlabel("off-band excess Brier")
+    axes[1].set_ylabel("|critical s error|")
+    axes[1].set_title(f"squared error, Spearman rho = {E['spearman_excess_vs_abs_err']:.2f}", fontsize=8.5)
+    from matplotlib.lines import Line2D
+
+    h = [Line2D([], [], color=COL[k], marker="o", ls="", label=LABEL[k]) for k in ("mpnn1", "mpnn2", "structured")]
+    h += [Line2D([], [], color="#6b645c", marker=m, ls="", label=f"family {f}") for f, m in zip("ABC", "os^", strict=True)]
+    axes[1].legend(handles=h, fontsize=7, frameon=False, loc="center left", bbox_to_anchor=(1.0, 0.5))
+    fig.tight_layout()
+    fig.savefig(out_dir() / "ember_e1_bias.png", dpi=130)
+    plt.close(fig)
+
+
 def main():
     S = load_result("summary")["result"]
     crossing(S)
     excess_vs_error(S)
     accuracy_trap(S)
+    ember_e1()
 
 
 if __name__ == "__main__":
